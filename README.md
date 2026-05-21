@@ -265,7 +265,6 @@ src/
 
 ---
 
-
 ### Dashboard
 
 ![Dashboard](./public/screenshot/dashboard.png)
