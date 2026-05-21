@@ -8,11 +8,8 @@ import { CFooter } from '@coreui/vue'
 
       <div class="footer-left">
         <span class="footer-brand">
-          <font-awesome-icon icon="link" class="me-2" />
-         <a
-            href="https://instagram.com/kiresy234"
-            target="_blank"
-          >
+          <font-awesome-icon icon="gem" />
+          <a href="https://instagram.com/kiresy234" target="_blank" class="footer-link">
             Apregi Prata
           </a>
         </span>
@@ -35,60 +32,73 @@ import { CFooter } from '@coreui/vue'
 
 <style scoped>
 .crm-footer {
-  background: #fff !important;
-  border-top: 1px solid #e5e7eb !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-main) !important;
   padding: 0 !important;
   min-height: 48px;
 }
-
 .footer-inner {
   width: 100%;
   padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-
 .footer-left,
 .footer-right {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
-
 .footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
-  color: #0f1117;
+  color: var(--text-primary);
   font-size: 0.85rem;
 }
-
+.footer-brand svg {
+  color: #6366f1;
+  font-size: 0.8rem;
+}
+.footer-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+.footer-link:hover {
+  color: #6366f1;
+}
 .footer-divider {
-  color: #d1d5db;
+  color: var(--border-main);
 }
-
 .footer-copy {
-  color: #9ca3af;
+  color: var(--text-muted);
+  font-size: 0.78rem;
 }
-
 .footer-version {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border: 1px solid var(--border-main);
   font-size: 0.7rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 99px;
 }
-
 .footer-status {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-weight: 500;
+  font-weight: 600;
   color: #6366f1;
+  font-size: 0.78rem;
 }
-
 .status-dot {
   width: 7px;
   height: 7px;
@@ -96,9 +106,8 @@ import { CFooter } from '@coreui/vue'
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50%       { opacity: 0.35; }
 }
 </style>

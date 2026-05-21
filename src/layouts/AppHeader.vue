@@ -9,6 +9,7 @@ import { useTheme } from '@/composables/useTheme'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+
 const { isDark, toggleTheme } = useTheme()
 const router = useRouter()
 
@@ -28,7 +29,8 @@ function goTo(path) {
 function logout() {
   showDropdown.value = false
   // logic logout di sini
-  alert('Logout!')
+  // alert('Logout!')
+  router.push('/login')
 }
 
 // Tutup dropdown kalau klik di luar

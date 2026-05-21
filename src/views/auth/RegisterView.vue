@@ -166,9 +166,8 @@ async function handleRegister() {
         </div>
 
         <div class="login-footer">
-          <router-link to="/login" class="back-link">
-            <font-awesome-icon :icon="['fas', 'arrow-left']" /> Kembali ke Login
-          </router-link>
+          Sudah punya akun? 
+          <router-link to="/login" class="auth-link">Login sekarang</router-link>
         </div>
 
         <div class="login-footer copyright">

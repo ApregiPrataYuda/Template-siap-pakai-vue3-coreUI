@@ -47,7 +47,12 @@ const menus = [
     section: 'Sales & Reports',
     items: [
       {
-        label: 'Sales',
+        label: 'Dashboard Sales',
+        icon: 'gauge',
+        to: '/app/home-sales',
+      },
+      {
+        label: 'Sales management',
         icon: 'chart-line',
         key: 'sales-menu',
         children: [
@@ -65,19 +70,19 @@ const menus = [
       },
 
       {
-        label: 'Reports',
+        label: 'Sales Reports',
         icon: 'file-lines',
         key: 'sales-reports',
         children: [
           {
-            label: 'Monthly',
+            label: 'Reports All',
             icon: 'calendar',
-            to: '/reports/monthly',
+            to: '/app/reports-sales',
           },
           {
-            label: 'Annual',
+            label: 'Reports Annual',
             icon: 'chart-bar',
-            to: '/reports/annual',
+            to: '/app/reports-sales/annual',
           },
         ],
       },
@@ -88,42 +93,58 @@ const menus = [
     section: 'Manager & Reports',
     items: [
       {
-        label: 'Manager',
+        label: 'Dashboard Manager',
+        icon: 'gauge',
+        to: '/app/home-manager',
+      },
+      {
+        label: 'Manager Management',
         icon: 'chart-line',
         key: 'manager-menu',
         children: [
           {
-            label: 'Reports PerWeek',
+            label: 'List Sales',
             icon: 'users',
-            to: '/manager/weekly',
+            to: '/manager/list-sales',
           },
           {
-            label: 'Reports PerMonth',
+            label: 'List Customers',
+            icon: 'users',
+            to: '/manager/list-customers',
+          },
+          {
+            label: 'List Leads',
             icon: 'user',
-            to: '/manager/monthly',
-          },
-          {
-            label: 'Reports PerYear',
-            icon: 'users',
-            to: '/manager/annual',
+            to: '/manager/list-leads',
           },
         ],
       },
 
       {
-        label: 'Reports',
+        label: 'Manager Reports',
         icon: 'file-lines',
         key: 'manager-reports',
         children: [
           {
-            label: 'Monthly',
-            icon: 'calendar',
-            to: '/manager/reports/monthly',
+            label: 'Reports All',
+            icon: 'users',
+            to: '/app/reports-manager',
+          },
+
+          {
+            label: 'Reports PerWeek',
+            icon: 'users',
+            to: '/app/reports-manager/weekly',
           },
           {
-            label: 'Annual',
-            icon: 'chart-bar',
-            to: '/manager/reports/annual',
+            label: 'Reports PerMonth',
+            icon: 'user',
+            to: '/app/reports-manager/monthly',
+          },
+          {
+            label: 'Reports PerYear',
+            icon: 'users',
+            to: '/app/reports-manager/annual',
           },
         ],
       },
@@ -141,7 +162,7 @@ const menus = [
       {
         label: 'Settings',
         icon: 'gear',
-        to: '',
+        to: '/app/settings',
       },
       {
         label: 'Table',

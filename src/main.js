@@ -59,6 +59,19 @@ import {
   faCircleLeft,
   faCircleRight,
   faLink,
+  faArrowTrendUp,
+  faArrowTrendDown,
+  faArrowRight,
+  faChartPie,
+  faShieldHalved,
+  faPalette,
+  faFloppyDisk,
+  faCamera,
+  faDesktop,
+  faMobileScreen,
+  faBan,
+  faClock,
+  faHome
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -85,8 +98,10 @@ library.add(
   faRotateLeft,
   faTrashCan,
   faCircleLeft,
-  faCircleRight,
-  faLink,
+  faCircleRight,faChartPie,
+  faLink,faArrowTrendUp, faArrowTrendDown, faArrowRight, faShieldHalved, faPalette, faFloppyDisk,
+  faCamera,
+  faDesktop, faMobileScreen, faBan, faClock, faHome
 )
 
 const app = createApp(App)

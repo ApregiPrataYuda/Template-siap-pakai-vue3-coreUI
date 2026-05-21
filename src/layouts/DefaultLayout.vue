@@ -44,7 +44,7 @@ onUnmounted(() => {
     />
 
     <div
-      class="wrapper d-flex flex-column min-vh-100 bg-light "
+      class="wrapper d-flex flex-column min-vh-100"
       :style="{
         marginLeft: !isMobile && sidebarVisible ? '240px' : '0px',
         transition: 'margin-left 0.3s ease',
@@ -52,7 +52,6 @@ onUnmounted(() => {
       }"
     >
       <AppHeader @toggle-sidebar="toggleSidebar" />
-
       <div class="body flex-grow-1 px-3 py-3 px-md-4 py-md-4">
         <!-- <AppBreadcrumb />  -->
         <router-view />

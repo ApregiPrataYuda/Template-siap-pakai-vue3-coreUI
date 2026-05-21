@@ -43,19 +43,51 @@ const routes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/dashboard/DashboardView.vue'),
+        component: () => import('@/views/template/dashboard/DashboardView.vue'),
       },
       
       {
         path: 'profile',
         name: 'Profile',
-        component: () => import('@/views/profile/ProfileView.vue'),
+        component: () => import('@/views/template/profile/ProfileView.vue'),
       },
 
       {
         path: 'table',
         name: 'Table',
-        component: () => import('@/views/table/TableView.vue'),
+        component: () => import('@/views/template/table/TableView.vue'),
+      },
+
+
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/views/template/settings/SettingsView.vue'),
+      },
+
+
+      {
+        path: 'reports-manager',
+        name: 'Manager Reports',
+        component: () => import('@/views/template/reports/ReportsManagerView.vue'),
+      },
+
+      {
+        path: 'reports-sales',
+        name: 'Sales Reports',
+        component: () => import('@/views/template/reports/ReportsSalesView.vue'),
+      },
+
+      {
+        path: 'home-sales',
+        name: 'Sales Home',
+        component: () => import('@/views/template/home/HomeSalesView.vue'),
+      },
+
+      {
+        path: 'home-manager',
+        name: 'Manager Home',
+        component: () => import('@/views/template/home/HomeManagerView.vue'),
       },
 
     ],

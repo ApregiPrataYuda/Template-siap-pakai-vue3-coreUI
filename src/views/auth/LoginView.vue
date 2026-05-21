@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useTheme } from '@/composables/useTheme'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const { isDark } = useTheme()
 
 const form = ref({
@@ -33,13 +34,15 @@ async function handleLogin() {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     console.log('LOGIN DATA =>', form.value)
-    // contoh redirect: router.push('/dashboard')
+      router.push('/app/dashboard')
   } catch (err) {
     errorMessage.value = 'Login gagal'
   } finally {
     loading.value = false
   }
 }
+
+
 </script>
 
 <template>
