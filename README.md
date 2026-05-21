@@ -252,6 +252,20 @@ src/
 
 ---
 
+
+### Register Page
+
+![Login](./public/screenshot/register.png)
+
+---
+
+### Profile Page
+
+![Login](./public/screenshot/profile.png)
+
+---
+
+
 ### Dashboard
 
 ![Dashboard](./public/screenshot/dashboard.png)
@@ -260,7 +274,7 @@ src/
 
 ### Table Page
 
-![Table](./public/screenshot/table.png)
+![Table](./public/screenshot/tableExample.png)
 
 ---
 
@@ -305,7 +319,7 @@ MIT License
 ## Author
 
 
-Developed and maintained by **Apregi Clavis**
+Developed and maintained by **Apregi Prata Yuda**
 
 - Instagram: [@kirey234](https://www.instagram.com/kirey234/)
 - GitHub: [github.com/ApregiPrataYuda](https://github.com/ApregiPrataYuda)

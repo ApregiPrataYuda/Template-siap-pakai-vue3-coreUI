@@ -6,16 +6,6 @@ const menus = ref([
   { id: 1, name: 'administrators', created: '24 Maret 2026' },
   { id: 2, name: 'sales',         created: '24 Maret 2026' },
   { id: 3, name: 'manager',       created: '24 Maret 2026' },
-  { id: 4, name: 'manager',       created: '24 Maret 2026' },
-  { id: 5, name: 'manager',       created: '24 Maret 2026' },
-  { id: 6, name: 'manager',       created: '24 Maret 2026' },
-  { id: 7, name: 'manager',       created: '24 Maret 2026' },
-  { id: 8, name: 'manager',       created: '24 Maret 2026' },
-  { id: 9, name: 'manager',       created: '24 Maret 2026' },
-  { id: 10, name: 'manager',      created: '24 Maret 2026' },
-  { id: 11, name: 'manager',      created: '24 Maret 2026' },
-  { id: 12, name: 'manager',      created: '24 Maret 2026' },
-  { id: 13, name: 'manager',      created: '24 Maret 2026' },
 ])
 const loading = ref(false)
 
