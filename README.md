@@ -1,61 +1,81 @@
 # TEMPLATE-VUE
 
-Modern Open Source Vue Admin Template built with CoreUI + Vite.
+Modern Open Source Vue 3 Admin Template built with CoreUI + Vite.
 
 ![Dashboard Preview](./public/screenshot/dashboard.png)
 
 ---
 
-## Overview
+## ✨ Overview
 
-TEMPLATE-VUE is a reusable admin dashboard template built using Vue 3 and CoreUI.
-
-This project is designed to help developers quickly start building modern admin panels, dashboards, and management systems with a clean and scalable architecture.
-
----
-
-## Features
-
-- Vue 3
-- Vite
-- CoreUI Layout
-- Vue Router
-- Pinia Store
-- Axios Service Layer
-- Responsive Layout
-- Reusable Components
-- Modular Folder Structure
-- Authentication Layout
-- Dashboard Layout
-- Open Source Ready
-
----
-
-## Tech Stack
+TEMPLATE-VUE is a reusable and scalable admin dashboard starter template built using:
 
 - Vue 3
 - Vite
 - CoreUI
-- Vue Router
 - Pinia
-- Axios
-- Bootstrap 5
-- Font Awesome
+- Vue Router
+
+This project is designed for developers who want to quickly build:
+
+- Admin Panels
+- CRM Systems
+- ERP Dashboards
+- Sales Management Systems
+- Internal Tools
+- Business Applications
+
+with a clean architecture and modern UI.
 
 ---
 
-## Installation
+## 🚀 Features
 
-Clone the repository:
+- ⚡ Vue 3 + Vite
+- 🎨 CoreUI Admin Layout
+- 📦 Modular Folder Structure
+- 🧩 Reusable Components
+- 🔐 Authentication Layout
+- 📊 Dashboard Pages
+- 📁 Reports Module
+- 👤 Profile Module
+- 📱 Fully Responsive
+- 🌙 Dark Mode Ready
+- 🔄 API Service Layer
+- 🧠 Pinia State Management
+- 🛣 Vue Router
+- 🎯 Clean Code Structure
+- 🆓 Open Source
+
+---
+
+## 🛠 Tech Stack
+
+| Technology | Description |
+|---|---|
+| Vue 3 | Frontend Framework |
+| Vite | Build Tool |
+| CoreUI | Admin Dashboard UI |
+| Vue Router | Routing System |
+| Pinia | State Management |
+| Axios | HTTP Client |
+| Bootstrap 5 | CSS Framework |
+| Font Awesome | Icons |
+
+---
+
+## 📦 Installation
+
+Clone repository:
 
 ```bash
-git clone https://github.com/ApregiPrataYuda/Template-siap-pakai-vue3-coreUI
+git clone https://github.com/ApregiPrataYuda/Template-siap-pakai-vue3-coreUI.git
 ```
 
 Enter project folder:
 
 ```bash
-cd template-vue
+cd Template-siap-pakai-vue3-coreUI
 ```
 
 Install dependencies:
@@ -72,7 +92,7 @@ npm run dev
 
 ---
 
-## Build Production
+## 🏗 Build Production
 
 ```bash
 npm run build
@@ -80,7 +100,7 @@ npm run build
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```bash
 src/
@@ -88,10 +108,26 @@ src/
 ├── components/
 ├── composables/
 ├── layouts/
+│   ├── AppHeader.vue
+│   ├── AppSidebar.vue
+│   ├── AppFooter.vue
+│   └── DefaultLayout.vue
+│
 ├── router/
+│   └── index.js
+│
 ├── services/
 ├── stores/
+│
 ├── views/
+│   ├── auth/
+│   ├── dashboard/
+│   ├── home/
+│   ├── profile/
+│   ├── reports/
+│   ├── settings/
+│   └── table/
+│
 ├── App.vue
 ├── main.js
 └── style.css
@@ -99,13 +135,13 @@ src/
 
 ---
 
-## Routing Structure
+## 🔐 Authentication Area
 
-This template separates the application into two main areas:
+Used for guest/public pages such as:
 
-### Authentication Area
-
-Used for guest/public pages such as login.
+- Login
+- Register
+- Forgot Password
 
 Example route:
 
@@ -113,19 +149,18 @@ Example route:
 /login
 ```
 
-File structure:
+Example structure:
 
 ```bash
 views/
 └── auth/
-    └── LoginView.vue
+    ├── LoginView.vue
+    └── RegisterView.vue
 ```
-
-
 
 ---
 
-### Application Area
+## 🖥 Application Area
 
 Used for authenticated pages after login.
 
@@ -135,15 +170,18 @@ Example route:
 /app/dashboard
 ```
 
-File structure:
+Example structure:
 
 ```bash
 views/
-└── dashboard/
-    └── DashboardView.vue
+├── dashboard/
+├── home/
+├── reports/
+├── profile/
+└── settings/
 ```
 
-Layout:
+Main layout:
 
 ```bash
 layouts/
@@ -152,7 +190,7 @@ layouts/
 
 ---
 
-## Application Flow
+## 🔄 Application Flow
 
 ```txt
 /login
@@ -160,14 +198,17 @@ layouts/
    └── User Login
            │
            ▼
-/app/dashboard
+/app/home
            │
-           └── Main Application Area
+           ├── Dashboard
+           ├── Reports
+           ├── Profile
+           └── Settings
 ```
 
 ---
 
-## Example Router Configuration
+## 🛣 Example Router Configuration
 
 ```js
 import { createRouter, createWebHistory } from 'vue-router'
@@ -195,7 +236,7 @@ const routes = [
     ],
   },
 
-  // APP AREA
+  // APPLICATION AREA
   {
     path: '/app',
     component: DefaultLayout,
@@ -204,6 +245,11 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/DashboardView.vue'),
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/profile/ProfileView.vue'),
       },
     ],
   },
@@ -220,31 +266,7 @@ export default router
 
 ---
 
-## Recommended Folder Structure
-
-```bash
-src/
-├── components/
-│   ├── common/
-│   ├── forms/
-│   ├── tables/
-│   └── ui/
-│
-├── views/
-│   ├── auth/
-│   ├── dashboard/
-│   ├── users/
-│   └── settings/
-│
-├── services/
-│   ├── api.js
-│   ├── auth.service.js
-│   └── user.service.js
-```
-
----
-
-## Screenshots
+## 📸 Screenshots
 
 ### Login Page
 
@@ -252,22 +274,21 @@ src/
 
 ---
 
-
 ### Register Page
 
-![Login](./public/screenshot/register.png)
+![Register](./public/screenshot/register.png)
+
+---
+
+### Dashboard Page
+
+![Dashboard](./public/screenshot/dashboard.png)
 
 ---
 
 ### Profile Page
 
-![Login](./public/screenshot/profile.png)
-
----
-
-### Dashboard
-
-![Dashboard](./public/screenshot/dashboard.png)
+![Profile](./public/screenshot/profile.png)
 
 ---
 
@@ -277,7 +298,13 @@ src/
 
 ---
 
-## Environment Variables
+### Table Page
+
+![Table](./public/screenshot/setting.png)
+
+---
+
+## 🌱 Environment Variables
 
 Create `.env` file:
 
@@ -287,43 +314,63 @@ VITE_API_URL=http://localhost:8000/api
 
 ---
 
-## Roadmap
+## 📌 Roadmap
 
-- [ ] Dark Mode
-- [ ] Dynamic Sidebar
-- [ ] Reusable Data Table
 - [ ] Authentication Guard
+- [ ] Dynamic Sidebar Menu
 - [ ] Role Permission
+- [ ] Reusable Data Table
+- [ ] API Generator
 - [ ] Notification System
 - [ ] Multi Language
 - [ ] Theme Customizer
-- [ ] API Generator
+- [ ] Dark Mode Optimization
+- [ ] Dashboard Widgets
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome.
 
-Feel free to fork this repository and submit pull requests.
+Feel free to:
+
+- Fork this repository
+- Create feature branches
+- Submit pull requests
+- Open issues
 
 ---
 
-## License
+## 📄 License
 
 MIT License
 
-Copyright (c) 2026 Apregikirey
+Copyright (c) 2026 Apregi Prata Yuda
 
-Permission is hereby granted...
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files to deal in the Software
+without restriction.
+
 ---
 
-## Author
-
+## 👨‍💻 Author
 
 Developed and maintained by **Apregi Prata Yuda**
 
-- Instagram: [@kirey234](https://www.instagram.com/kirey234/)
-- GitHub: [github.com/ApregiPrataYuda](https://github.com/ApregiPrataYuda)
+- Instagram: https://www.instagram.com/kirey234/
+- GitHub: https://github.com/ApregiPrataYuda
 
-Developed with Vue 3 + CoreUI.
+---
+
+## ⭐ Support
+
+If you like this project:
+
+- Give this repository a ⭐
+- Fork and customize it
+- Share with other developers
+
+---
+
+Built with ❤️ using Vue 3 + CoreUI
