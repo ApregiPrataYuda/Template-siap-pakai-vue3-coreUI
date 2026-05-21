@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+
+  "author": "Apregi Prata Yuda",
+  "license": "MIT",
+  "homepage": "https://github.com/ApregiPrataYuda/Template-siap-pakai-vue3-coreUI",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

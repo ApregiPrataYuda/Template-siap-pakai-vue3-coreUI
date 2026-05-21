@@ -58,6 +58,7 @@ import {
   faTrashCan,
   faCircleLeft,
   faCircleRight,
+  faLink,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -85,6 +86,7 @@ library.add(
   faTrashCan,
   faCircleLeft,
   faCircleRight,
+  faLink,
 )
 
 const app = createApp(App)

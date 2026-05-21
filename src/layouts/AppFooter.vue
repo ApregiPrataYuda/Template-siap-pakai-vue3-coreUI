@@ -8,8 +8,13 @@ import { CFooter } from '@coreui/vue'
 
       <div class="footer-left">
         <span class="footer-brand">
-          <font-awesome-icon icon="gem" class="me-2" />
-          PT SATU DUA
+          <font-awesome-icon icon="link" class="me-2" />
+         <a
+            href="https://instagram.com/kiresy234"
+            target="_blank"
+          >
+            Apregi Prata
+          </a>
         </span>
         <span class="footer-divider">·</span>
         <span class="footer-copy">© {{ new Date().getFullYear() }} All rights reserved</span>

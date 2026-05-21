@@ -313,6 +313,9 @@ Feel free to fork this repository and submit pull requests.
 
 MIT License
 
+Copyright (c) 2026 Apregikirey
+
+Permission is hereby granted...
 ---
 
 ## Author
