@@ -1,0 +1,817 @@
+<script setup>
+import { ref, computed } from 'vue'
+
+// semua logic sama, tidak berubah...
+const menus = ref([
+  { id: 1, name: 'administrators', created: '24 Maret 2026' },
+  { id: 2, name: 'sales',         created: '24 Maret 2026' },
+  { id: 3, name: 'manager',       created: '24 Maret 2026' },
+  { id: 4, name: 'manager',       created: '24 Maret 2026' },
+  { id: 5, name: 'manager',       created: '24 Maret 2026' },
+  { id: 6, name: 'manager',       created: '24 Maret 2026' },
+  { id: 7, name: 'manager',       created: '24 Maret 2026' },
+  { id: 8, name: 'manager',       created: '24 Maret 2026' },
+  { id: 9, name: 'manager',       created: '24 Maret 2026' },
+  { id: 10, name: 'manager',      created: '24 Maret 2026' },
+  { id: 11, name: 'manager',      created: '24 Maret 2026' },
+  { id: 12, name: 'manager',      created: '24 Maret 2026' },
+  { id: 13, name: 'manager',      created: '24 Maret 2026' },
+])
+const loading = ref(false)
+
+const searchQuery = ref('')
+const filteredRows = computed(() => {
+  if (!searchQuery.value) return menus.value
+  const q = searchQuery.value.toLowerCase()
+  return menus.value.filter(m =>
+    Object.values(m).some(v => String(v).toLowerCase().includes(q))
+  )
+})
+
+const sortBy  = ref('created')
+const sortDir = ref('Desc')
+const sortByOptions = [
+  { label: 'Created Date', value: 'created' },
+  { label: 'Menu Name',    value: 'name' },
+]
+const sortByLabel = computed(() =>
+  sortByOptions.find(o => o.value === sortBy.value)?.label ?? 'Created Date'
+)
+const sortedRows = computed(() => {
+  return [...filteredRows.value].sort((a, b) => {
+    const cmp = String(a[sortBy.value]).localeCompare(String(b[sortBy.value]))
+    return sortDir.value === 'Asc' ? cmp : -cmp
+  })
+})
+
+const perPage     = ref(10)
+const currentPage = ref(1)
+const totalPages  = computed(() =>
+  Math.max(1, Math.ceil(sortedRows.value.length / perPage.value))
+)
+const paginatedRows = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  return sortedRows.value.slice(start, start + perPage.value)
+})
+
+const showExportMenu  = ref(false)
+const showImportMenu  = ref(false)
+const showPerPageMenu = ref(false)
+const showSortByMenu  = ref(false)
+const showSortDirMenu = ref(false)
+
+function handleReset() {
+  searchQuery.value = ''
+  sortBy.value      = 'created'
+  sortDir.value     = 'Desc'
+  perPage.value     = 10
+  currentPage.value = 1
+}
+
+function exportCSV() {
+  const header = 'ID,Name,Created\n'
+  const rows   = menus.value.map(m => `${m.id},"${m.name}","${m.created}"`).join('\n')
+  const blob   = new Blob([header + rows], { type: 'text/csv' })
+  const url    = URL.createObjectURL(blob)
+  const a      = document.createElement('a')
+  a.href = url; a.download = 'menus.csv'; a.click()
+  URL.revokeObjectURL(url)
+  showExportMenu.value = false
+}
+function exportExcel() { showExportMenu.value = false }
+function exportPDF()   { showExportMenu.value = false }
+
+const isAddModalVisible    = ref(false)
+const isEdit               = ref(false)
+const selectedEditMenu     = ref(null)
+const newMenuName          = ref('')
+const isDeleteModalVisible = ref(false)
+const selectedMenu         = ref(null)
+const isDetailModalVisible = ref(false)
+const detailMenu           = ref(null)
+
+function openAddModal() {
+  isEdit.value = false; newMenuName.value = ''; selectedEditMenu.value = null
+  isAddModalVisible.value = true
+}
+function openEditModal(menu) {
+  isEdit.value = true; selectedEditMenu.value = menu; newMenuName.value = menu.name
+  isAddModalVisible.value = true
+}
+function closeAddModal() { isAddModalVisible.value = false }
+function submitAddData() {
+  if (!newMenuName.value.trim()) return alert('Menu name wajib diisi!')
+  if (isEdit.value && selectedEditMenu.value) {
+    const idx = menus.value.findIndex(m => m.id === selectedEditMenu.value.id)
+    if (idx > -1) menus.value[idx].name = newMenuName.value.toLowerCase()
+  } else {
+    menus.value.push({
+      id: menus.value.length + 1,
+      name: newMenuName.value.toLowerCase(),
+      created: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+    })
+  }
+  closeAddModal()
+}
+
+function openDeleteModal(menu) { selectedMenu.value = menu; isDeleteModalVisible.value = true }
+function closeDeleteModal()    { isDeleteModalVisible.value = false; selectedMenu.value = null }
+function submitDeleteData()    { menus.value = menus.value.filter(m => m.id !== selectedMenu.value.id); closeDeleteModal() }
+
+function openDetailModal(menu) { detailMenu.value = menu; isDetailModalVisible.value = true }
+function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.value = null }
+</script>
+
+<template>
+  <div class="h-100 d-flex flex-column">
+
+    <!-- TOOLBAR TOP -->
+    <div class="toolbar-top">
+      <div class="toolbar-left">
+        <div class="drop-wrap">
+          <button class="btn-toolbar btn-purple" @click="showExportMenu = !showExportMenu">
+            <font-awesome-icon icon="upload" /> Exports
+            <font-awesome-icon icon="chevron-down" class="btn-arrow" />
+          </button>
+          <div class="drop-menu" :class="{ show: showExportMenu }">
+            <div class="drop-label">Export Data</div>
+            <button class="drop-item" @click="exportCSV">
+              <font-awesome-icon icon="file-csv" style="color:#22c55e" /> Export CSV
+            </button>
+            <button class="drop-item" @click="exportExcel">
+              <font-awesome-icon icon="file-excel" style="color:#16a34a" /> Export Excel
+            </button>
+            <button class="drop-item" @click="exportPDF">
+              <font-awesome-icon icon="file-pdf" style="color:#ef4444" /> Export PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="drop-wrap">
+          <button class="btn-toolbar btn-purple" @click="showImportMenu = !showImportMenu">
+            <font-awesome-icon icon="download" /> Imports
+            <font-awesome-icon icon="chevron-down" class="btn-arrow" />
+          </button>
+          <div class="drop-menu" :class="{ show: showImportMenu }">
+            <div class="drop-label">Import Data</div>
+            <button class="drop-item">
+              <font-awesome-icon icon="file-csv" style="color:#22c55e" /> Import CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-toolbar btn-orange" @click="handleReset">
+        <font-awesome-icon icon="rotate-left" /> Reset
+      </button>
+    </div>
+
+    <!-- CONTROLS CARD -->
+    <div class="controls-card">
+      <div class="controls-row">
+        <div class="controls-left">
+          <div class="showing-wrap">
+            <font-awesome-icon icon="list" class="text-muted-color" />
+            <span class="showing-label">Showing:</span>
+            <div class="drop-wrap">
+              <button class="btn-select" @click="showPerPageMenu = !showPerPageMenu">
+                {{ perPage }} <font-awesome-icon icon="chevron-down" class="btn-arrow" />
+              </button>
+              <div class="drop-menu" :class="{ show: showPerPageMenu }">
+                <div class="drop-label">Per halaman</div>
+                <div class="perpage-grid">
+                  <button
+                    v-for="opt in [5,10,25,50]" :key="opt"
+                    class="perpage-opt" :class="{ active: perPage === opt }"
+                    @click="perPage = opt; showPerPageMenu = false; currentPage = 1"
+                  >{{ opt }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="btn-toolbar btn-purple" @click="openAddModal">
+            <font-awesome-icon icon="plus" /> Add Data
+          </button>
+        </div>
+
+        <div class="controls-right">
+          <div class="search-wrap">
+            <input v-model="searchQuery" type="text" placeholder="Searching...." class="search-input" @input="currentPage = 1" />
+            <button class="search-btn"><font-awesome-icon icon="magnifying-glass" /></button>
+          </div>
+          <div class="sort-wrap">
+            <span class="showing-label">Sort:</span>
+            <div class="drop-wrap">
+              <button class="btn-select" @click="showSortByMenu = !showSortByMenu">
+                {{ sortByLabel }} <font-awesome-icon icon="chevron-down" class="btn-arrow" />
+              </button>
+              <div class="drop-menu" :class="{ show: showSortByMenu }">
+                <div class="drop-label">Sort By</div>
+                <button v-for="opt in sortByOptions" :key="opt.value" class="drop-item"
+                  :class="{ active: sortBy === opt.value }"
+                  @click="sortBy = opt.value; showSortByMenu = false">{{ opt.label }}</button>
+              </div>
+            </div>
+            <div class="drop-wrap">
+              <button class="btn-select" @click="showSortDirMenu = !showSortDirMenu">
+                {{ sortDir }} <font-awesome-icon icon="chevron-down" class="btn-arrow" />
+              </button>
+              <div class="drop-menu drop-right" :class="{ show: showSortDirMenu }">
+                <div class="drop-label">Urutan</div>
+                <button v-for="opt in ['Desc', 'Asc']" :key="opt" class="drop-item"
+                  :class="{ active: sortDir === opt }"
+                  @click="sortDir = opt; showSortDirMenu = false">{{ opt }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card flex-grow-1 overflow-auto mb-3">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:70px">NO.</th>
+            <th>MENU NAME</th>
+            <th style="width:200px">CREATED</th>
+            <th style="width:160px; text-align:center">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="loading">
+            <td colspan="4" class="td-center">
+              <font-awesome-icon icon="spinner" spin /> Memuat data...
+            </td>
+          </tr>
+          <tr v-else-if="paginatedRows.length === 0">
+            <td colspan="4" class="td-center">
+              <div class="empty-state">
+                <font-awesome-icon icon="inbox" class="empty-icon" />
+                <div>Tidak ada data ditemukan</div>
+              </div>
+            </td>
+          </tr>
+          <tr v-else v-for="(menu, index) in paginatedRows" :key="menu.id" class="data-row">
+            <td class="td-no">{{ (currentPage - 1) * perPage + index + 1 }}.</td>
+            <td class="td-name">{{ menu.name }}</td>
+            <td class="td-muted">{{ menu.created }}</td>
+            <td class="td-actions">
+              <button class="act-btn act-edit"   @click="openEditModal(menu)"   title="Edit">
+                <font-awesome-icon icon="pen-to-square" />
+              </button>
+              <button class="act-btn act-delete" @click="openDeleteModal(menu)" title="Hapus">
+                <font-awesome-icon icon="trash-can" />
+              </button>
+              <button class="act-btn act-info"   @click="openDetailModal(menu)" title="Detail">
+                <font-awesome-icon icon="circle-info" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-card">
+      <button class="btn-prev-next" :disabled="currentPage === 1" @click="currentPage--">
+        <font-awesome-icon icon="circle-left" /> Prev
+      </button>
+      <div class="page-badges">
+        <span class="page-badge">{{ paginatedRows.length }} DATA | ON PAGE {{ currentPage }}</span>
+        <span class="page-badge">TOTAL: {{ sortedRows.length }}</span>
+      </div>
+      <button class="btn-prev-next" :disabled="currentPage === totalPages" @click="currentPage++">
+        Next <font-awesome-icon icon="circle-right" />
+      </button>
+    </div>
+
+    <!-- ===== SATU TELEPORT UNTUK SEMUA MODAL ===== -->
+    <Teleport to="body">
+
+      <!-- Modal Add/Edit -->
+      <div v-if="isAddModalVisible" class="modal-overlay" @click.self="closeAddModal">
+        <div class="modal-box">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <font-awesome-icon :icon="isEdit ? 'pen' : 'plus'" />
+              {{ isEdit ? 'Edit Menu' : 'Add New Menu' }}
+            </h5>
+            <button class="modal-close" @click="closeAddModal">
+              <font-awesome-icon icon="xmark" />
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Menu Name</label>
+              <input v-model="newMenuName" class="form-input" placeholder="e.g. supervisor, content manager" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="closeAddModal">Cancel</button>
+            <button class="btn-save" @click="submitAddData">
+              <font-awesome-icon icon="check" />
+              {{ isEdit ? 'Update' : 'Save Data' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Delete -->
+      <div v-if="isDeleteModalVisible" class="modal-overlay" @click.self="closeDeleteModal">
+        <div class="modal-box modal-sm">
+          <div class="modal-body text-center py-4">
+            <div class="delete-icon-wrap">
+              <font-awesome-icon icon="triangle-exclamation" />
+            </div>
+            <h5 class="modal-danger-title">Delete Menu Data?</h5>
+            <p class="modal-danger-text">
+              Yakin ingin menghapus menu <strong>"{{ selectedMenu?.name }}"</strong>?
+              Tindakan ini tidak bisa dibatalkan.
+            </p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button class="btn-cancel" @click="closeDeleteModal">Cancel</button>
+            <button class="btn-danger" @click="submitDeleteData">
+              <font-awesome-icon icon="trash-can" /> Yes, Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Detail -->
+      <div v-if="isDetailModalVisible" class="modal-overlay" @click.self="closeDetailModal">
+        <div class="modal-box">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <font-awesome-icon icon="circle-info" /> Menu Details
+            </h5>
+            <button class="modal-close" @click="closeDetailModal">
+              <font-awesome-icon icon="xmark" />
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Menu ID</span>
+                <span class="detail-value mono">#{{ detailMenu?.id }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Menu Name</span>
+                <span class="detail-badge">{{ detailMenu?.name }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Created At</span>
+                <span class="detail-value">{{ detailMenu?.created }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="badge-active">Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="closeDetailModal">Close</button>
+          </div>
+        </div>
+      </div>
+
+    </Teleport>
+    <!-- ===== END TELEPORT ===== -->
+
+  </div>
+</template>
+
+<style scoped>
+/* semua style sama persis, tidak ada yang berubah */
+.toolbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.toolbar-left { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.btn-purple { background: #6366f1; color: #fff; }
+.btn-purple:hover { background: #4f46e5; }
+.btn-orange { background: #f59e0b; color: #fff; }
+.btn-orange:hover { background: #d97706; }
+.btn-arrow { font-size: 0.6rem; opacity: 0.7; }
+.controls-card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.controls-left, .controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.showing-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.showing-label { white-space: nowrap; color: var(--text-muted); font-size: 0.83rem; }
+.text-muted-color { color: var(--text-muted); }
+.search-wrap {
+  display: flex;
+  border: 1px solid var(--border-main);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-input);
+}
+.search-input {
+  padding: 7px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  outline: none;
+  width: 200px;
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-btn {
+  padding: 7px 12px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.search-btn:hover { background: #4f46e5; }
+.sort-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.drop-wrap { position: relative; }
+.btn-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-main);
+  border-radius: 7px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.btn-select:hover { border-color: #6366f1; color: #6366f1; }
+.drop-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-main);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 10px;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: all 0.18s ease;
+}
+.drop-right { left: auto; right: 0; }
+.drop-menu.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+.drop-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.drop-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+.drop-item:hover { background: var(--bg-nav-hover); }
+.drop-item.active { color: #6366f1; font-weight: 600; background: rgba(99,102,241,0.08); }
+.perpage-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.perpage-opt {
+  padding: 5px 10px;
+  border: 1px solid var(--border-main);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.perpage-opt:hover  { border-color: #6366f1; color: #6366f1; }
+.perpage-opt.active { background: #6366f1; border-color: #6366f1; color: #fff; font-weight: 700; }
+.table-card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  overflow: auto;
+}
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.data-table thead tr {
+  background: var(--bg-input);
+  border-bottom: 2px solid var(--border-main);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.data-table th {
+  padding: 12px 18px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.data-table tbody tr { border-bottom: 1px solid var(--border-main); transition: background 0.15s; }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-row:hover { background: var(--bg-nav-hover); }
+.data-table td { padding: 13px 18px; vertical-align: middle; color: var(--text-primary); }
+.td-no     { color: var(--text-muted); font-weight: 600; }
+.td-name   { font-weight: 500; }
+.td-muted  { color: var(--text-muted); font-size: 0.84rem; }
+.td-center { text-align: center; padding: 40px; color: var(--text-muted); }
+.td-actions { text-align: center; }
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); }
+.empty-icon  { font-size: 2rem; opacity: 0.3; }
+.act-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  margin: 0 2px;
+  background: transparent;
+}
+.act-edit         { color: #f59e0b; border-color: #f59e0b; }
+.act-edit:hover   { background: #f59e0b; color: #fff; }
+.act-delete       { color: #ef4444; border-color: #ef4444; }
+.act-delete:hover { background: #ef4444; color: #fff; }
+.act-info         { color: #6366f1; border-color: #6366f1; }
+.act-info:hover   { background: #6366f1; color: #fff; }
+.pagination-card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 12px 18px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn-prev-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s;
+  min-width: 90px;
+  justify-content: center;
+}
+.btn-prev-next:hover:not(:disabled) { background: #dc2626; }
+.btn-prev-next:disabled { opacity: 0.35; cursor: not-allowed; }
+.page-badges { display: flex; gap: 8px; align-items: center; }
+.page-badge {
+  padding: 7px 14px;
+  border: 1px solid var(--border-main);
+  border-radius: 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-box {
+  background: var(--bg-card);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.22s ease;
+}
+.modal-sm { max-width: 360px; }
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-main);
+}
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.modal-title svg { color: #6366f1; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: var(--bg-nav-hover); color: var(--text-primary); }
+.modal-body { padding: 20px; }
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-main);
+}
+.justify-content-center { justify-content: center !important; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.form-input {
+  padding: 9px 12px;
+  border: 1px solid var(--border-main);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  transition: border 0.18s;
+  width: 100%;
+}
+.form-input:focus { border-color: #6366f1; }
+.btn-cancel {
+  padding: 8px 18px;
+  background: var(--bg-main);
+  color: var(--text-muted);
+  border: 1px solid var(--border-main);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-cancel:hover { background: var(--border-main); }
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-save:hover { background: #4f46e5; }
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-danger:hover { background: #dc2626; }
+.delete-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin: 0 auto 14px;
+}
+.modal-danger-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.modal-danger-text  { font-size: 0.84rem; color: var(--text-muted); padding: 0 10px; line-height: 1.6; }
+.detail-list { display: flex; flex-direction: column; }
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-main);
+  gap: 12px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.detail-value { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+.mono { font-family: monospace; font-weight: 700; }
+.detail-badge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 6px;
+  background: rgba(99,102,241,0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99,102,241,0.2);
+}
+.badge-active {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgba(34,197,94,0.1);
+  color: #16a34a;
+}
+</style>
