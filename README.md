@@ -49,7 +49,7 @@ This project is designed to help developers quickly start building modern admin 
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/template-vue.git
+git clone https://github.com/ApregiPrataYuda/Template-siap-pakai-vue3-coreUI
 ```
 
 Enter project folder:
