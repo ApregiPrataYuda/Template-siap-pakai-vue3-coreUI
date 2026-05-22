@@ -1,13 +1,21 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// semua logic sama, tidak berubah...
 const menus = ref([
-  { id: 1, name: 'administrators', created: '24 Maret 2026' },
-  { id: 2, name: 'sales',         created: '24 Maret 2026' },
-  { id: 3, name: 'manager',       created: '24 Maret 2026' },
+  { id: 1, name: 'administrators', role: 'admin', created: '24 Maret 2026' },
+  { id: 2, name: 'sales',          role: 'sales', created: '24 Maret 2026' },
+  { id: 3, name: 'manager',        role: 'manager', created: '24 Maret 2026' },
 ])
 const loading = ref(false)
+
+// State untuk opsi role
+const roleOptions = [
+  { label: 'Administrator', value: 'admin' },
+  { label: 'Manager', value: 'manager' },
+  { label: 'Sales', value: 'sales' },
+  { label: 'HR', value: 'hr' },
+  { label: 'Staff', value: 'staff' }
+]
 
 const searchQuery = ref('')
 const filteredRows = computed(() => {
@@ -31,7 +39,7 @@ const sortedRows = computed(() => {
   return [...filteredRows.value].sort((a, b) => {
     const cmp = String(a[sortBy.value]).localeCompare(String(b[sortBy.value]))
     return sortDir.value === 'Asc' ? cmp : -cmp
-  })
+  }) // <-- Sudah diperbaiki menjadi }) bukan )
 })
 
 const perPage     = ref(10)
@@ -59,8 +67,8 @@ function handleReset() {
 }
 
 function exportCSV() {
-  const header = 'ID,Name,Created\n'
-  const rows   = menus.value.map(m => `${m.id},"${m.name}","${m.created}"`).join('\n')
+  const header = 'ID,Name,Role,Created\n'
+  const rows   = menus.value.map(m => `${m.id},"${m.name}","${m.role}","${m.created}"`).join('\n')
   const blob   = new Blob([header + rows], { type: 'text/csv' })
   const url    = URL.createObjectURL(blob)
   const a      = document.createElement('a')
@@ -71,33 +79,47 @@ function exportCSV() {
 function exportExcel() { showExportMenu.value = false }
 function exportPDF()   { showExportMenu.value = false }
 
+// State Form Modal
 const isAddModalVisible    = ref(false)
 const isEdit               = ref(false)
 const selectedEditMenu     = ref(null)
 const newMenuName          = ref('')
+const selectedRole         = ref('admin') // State penampung role yang dipilih
+
 const isDeleteModalVisible = ref(false)
 const selectedMenu         = ref(null)
 const isDetailModalVisible = ref(false)
 const detailMenu           = ref(null)
 
 function openAddModal() {
-  isEdit.value = false; newMenuName.value = ''; selectedEditMenu.value = null
+  isEdit.value = false; 
+  newMenuName.value = ''; 
+  selectedRole.value = 'admin'; 
+  selectedEditMenu.value = null
+  selectedFileName.value = 'No file chosen'; 
   isAddModalVisible.value = true
 }
 function openEditModal(menu) {
   isEdit.value = true; selectedEditMenu.value = menu; newMenuName.value = menu.name
+  selectedRole.value = menu.role || 'admin' // Ambil role lama atau fallback ke admin
   isAddModalVisible.value = true
 }
 function closeAddModal() { isAddModalVisible.value = false }
+
 function submitAddData() {
   if (!newMenuName.value.trim()) return alert('Menu name wajib diisi!')
+  
   if (isEdit.value && selectedEditMenu.value) {
     const idx = menus.value.findIndex(m => m.id === selectedEditMenu.value.id)
-    if (idx > -1) menus.value[idx].name = newMenuName.value.toLowerCase()
+    if (idx > -1) {
+      menus.value[idx].name = newMenuName.value.toLowerCase()
+      menus.value[idx].role = selectedRole.value // Simpan perubahan role
+    }
   } else {
     menus.value.push({
       id: menus.value.length + 1,
       name: newMenuName.value.toLowerCase(),
+      role: selectedRole.value, // Simpan data role baru
       created: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
   }
@@ -110,12 +132,52 @@ function submitDeleteData()    { menus.value = menus.value.filter(m => m.id !== 
 
 function openDetailModal(menu) { detailMenu.value = menu; isDetailModalVisible.value = true }
 function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.value = null }
+
+// Helper untuk dapetin text label role yang rapi saat di detail modal
+const getRoleLabel = (roleValue) => {
+  return roleOptions.find(o => o.value === roleValue)?.label ?? roleValue
+}
+
+const selectedFileName = ref('No file chosen') // State untuk nama file
+
+
+
+// Handle perubahan file pas user milih file
+function handleFileChange(event) {
+  const file = event.target.files[0]
+  if (file) {
+    selectedFileName.value = file.name
+  } else {
+    selectedFileName.value = 'No file chosen'
+  }
+}
 </script>
 
 <template>
   <div class="h-100 d-flex flex-column">
 
-    <!-- TOOLBAR TOP -->
+    <div class="breadcrumb-card mb-2">
+      <div class="breadcrumb-left">
+        <h4 class="breadcrumb-title">
+          <font-awesome-icon icon="table-list" />
+          Menu Management
+        </h4>
+
+        <div class="breadcrumb-path">
+          <span class="breadcrumb-item">
+            <font-awesome-icon icon="house" />
+            Dashboard
+          </span>
+
+          <font-awesome-icon icon="chevron-right" class="breadcrumb-separator" />
+
+          <span class="breadcrumb-item active">
+            Menu Table
+          </span>
+        </div>
+      </div>
+    </div>
+
     <div class="toolbar-top">
       <div class="toolbar-left">
         <div class="drop-wrap">
@@ -156,7 +218,6 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
       </button>
     </div>
 
-    <!-- CONTROLS CARD -->
     <div class="controls-card">
       <div class="controls-row">
         <div class="controls-left">
@@ -218,25 +279,25 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
       </div>
     </div>
 
-    <!-- TABLE -->
     <div class="table-card flex-grow-1 overflow-auto mb-3">
       <table class="data-table">
         <thead>
           <tr>
             <th style="width:70px">NO.</th>
             <th>MENU NAME</th>
+            <th style="width:180px">ROLE</th>
             <th style="width:200px">CREATED</th>
             <th style="width:160px; text-align:center">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="loading">
-            <td colspan="4" class="td-center">
+            <td colspan="5" class="td-center">
               <font-awesome-icon icon="spinner" spin /> Memuat data...
             </td>
           </tr>
           <tr v-else-if="paginatedRows.length === 0">
-            <td colspan="4" class="td-center">
+            <td colspan="5" class="td-center">
               <div class="empty-state">
                 <font-awesome-icon icon="inbox" class="empty-icon" />
                 <div>Tidak ada data ditemukan</div>
@@ -246,6 +307,9 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
           <tr v-else v-for="(menu, index) in paginatedRows" :key="menu.id" class="data-row">
             <td class="td-no">{{ (currentPage - 1) * perPage + index + 1 }}.</td>
             <td class="td-name">{{ menu.name }}</td>
+            <td>
+              <span class="table-role-badge">{{ getRoleLabel(menu.role) }}</span>
+            </td>
             <td class="td-muted">{{ menu.created }}</td>
             <td class="td-actions">
               <button class="act-btn act-edit"   @click="openEditModal(menu)"   title="Edit">
@@ -263,24 +327,23 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
       </table>
     </div>
 
-    <!-- PAGINATION -->
     <div class="pagination-card">
-      <button class="btn-prev-next" :disabled="currentPage === 1" @click="currentPage--">
-        <font-awesome-icon icon="circle-left" /> Prev
-      </button>
+      <div class="pagination-nav">
+        <button class="btn-prev-next" :disabled="currentPage === 1" @click="currentPage--">
+          <font-awesome-icon icon="circle-left" /> Prev
+        </button>
+        <button class="btn-prev-next" :disabled="currentPage === totalPages" @click="currentPage++">
+          Next <font-awesome-icon icon="circle-right" />
+        </button>
+      </div>
       <div class="page-badges">
         <span class="page-badge">{{ paginatedRows.length }} DATA | ON PAGE {{ currentPage }}</span>
         <span class="page-badge">TOTAL: {{ sortedRows.length }}</span>
       </div>
-      <button class="btn-prev-next" :disabled="currentPage === totalPages" @click="currentPage++">
-        Next <font-awesome-icon icon="circle-right" />
-      </button>
     </div>
 
-    <!-- ===== SATU TELEPORT UNTUK SEMUA MODAL ===== -->
     <Teleport to="body">
 
-      <!-- Modal Add/Edit -->
       <div v-if="isAddModalVisible" class="modal-overlay" @click.self="closeAddModal">
         <div class="modal-box">
           <div class="modal-header">
@@ -293,9 +356,54 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
             </button>
           </div>
           <div class="modal-body">
-            <div class="form-group">
-              <label>Menu Name</label>
-              <input v-model="newMenuName" class="form-input" placeholder="e.g. supervisor, content manager" />
+            <div class="form-container-gap">
+              
+              <div class="form-group">
+                <label>Menu Name</label>
+                <input v-model="newMenuName" class="form-input" placeholder="e.g. supervisor, content manager" />
+              </div>
+
+              <div class="form-group">
+                <label>Menu Role (Select Biasa)</label>
+                <select v-model="selectedRole" class="form-input form-select">
+                  <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Menu Role (Segmented)</label>
+                <div class="segment-group">
+                  <button
+                    v-for="role in roleOptions"
+                    :key="role.value"
+                    type="button"
+                    class="segment-btn"
+                    :class="{ active: selectedRole === role.value }"
+                    @click="selectedRole = role.value"
+                  >
+                    {{ role.label }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+  <label>Upload File</label>
+  <div class="file-upload-wrapper">
+    <input 
+      type="file" 
+      id="manual-file-input" 
+      class="file-hidden-input" 
+      @change="handleFileChange" 
+    />
+    <label for="manual-file-input" class="file-custom-label">
+      <span class="btn-browse">Browse</span>
+      <span class="file-name-text">{{ selectedFileName }}</span>
+    </label>
+  </div>
+</div>
+
             </div>
           </div>
           <div class="modal-footer">
@@ -308,7 +416,6 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
         </div>
       </div>
 
-      <!-- Modal Delete -->
       <div v-if="isDeleteModalVisible" class="modal-overlay" @click.self="closeDeleteModal">
         <div class="modal-box modal-sm">
           <div class="modal-body text-center py-4">
@@ -330,7 +437,6 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
         </div>
       </div>
 
-      <!-- Modal Detail -->
       <div v-if="isDetailModalVisible" class="modal-overlay" @click.self="closeDetailModal">
         <div class="modal-box">
           <div class="modal-header">
@@ -352,6 +458,10 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
                 <span class="detail-badge">{{ detailMenu?.name }}</span>
               </div>
               <div class="detail-row">
+                <span class="detail-label">Assigned Role</span>
+                <span class="detail-value font-semibold">{{ getRoleLabel(detailMenu?.role) }}</span>
+              </div>
+              <div class="detail-row">
                 <span class="detail-label">Created At</span>
                 <span class="detail-value">{{ detailMenu?.created }}</span>
               </div>
@@ -368,13 +478,66 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
       </div>
 
     </Teleport>
-    <!-- ===== END TELEPORT ===== -->
-
-  </div>
+    </div>
 </template>
 
 <style scoped>
-/* semua style sama persis, tidak ada yang berubah */
+/* ===== BREADCRUMB ===== */
+.breadcrumb-card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.breadcrumb-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.breadcrumb-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.breadcrumb-title svg {
+  color: #6366f1;
+}
+
+.breadcrumb-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.breadcrumb-item.active {
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.breadcrumb-separator {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
 .toolbar-top {
   display: flex;
   align-items: center;
@@ -591,35 +754,53 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
 .act-delete:hover { background: #ef4444; color: #fff; }
 .act-info         { color: #6366f1; border-color: #6366f1; }
 .act-info:hover   { background: #6366f1; color: #fff; }
+
+.table-role-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-main);
+  color: var(--text-primary);
+}
+
+/* ===== PAGINATION BASE (Desktop & Tablet) ===== */
 .pagination-card {
   background: var(--bg-card);
   border-radius: 10px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   box-shadow: 0 1px 3px var(--shadow-color);
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+}
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .btn-prev-next {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 18px;
-  background: #ef4444;
+  padding: 8px 16px;
+  background: #6366f1;
   color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.18s;
-  min-width: 90px;
+  min-width: 85px;
   justify-content: center;
+  transition: background 0.18s ease;
 }
-.btn-prev-next:hover:not(:disabled) { background: #dc2626; }
+.btn-prev-next:hover:not(:disabled) { background: #4f46e5; }
 .btn-prev-next:disabled { opacity: 0.35; cursor: not-allowed; }
+
 .page-badges { display: flex; gap: 8px; align-items: center; }
 .page-badge {
   padding: 7px 14px;
@@ -632,6 +813,36 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
   white-space: nowrap;
   letter-spacing: 0.04em;
 }
+
+/* ===== TAMPILAN MOBILE RESPONSIVE (Layar HP) ===== */
+@media (max-width: 576px) {
+  .pagination-card {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+  .pagination-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .btn-prev-next {
+    flex: 1;
+    max-width: 48%;
+    padding: 10px 14px;
+  }
+  .page-badges {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .page-badge {
+    flex: 1;
+    text-align: center;
+    font-size: 0.7rem;
+  }
+}
+
+/* ===== MODAL BASE & COMPONENT RENDER ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -695,6 +906,13 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
   border-top: 1px solid var(--border-main);
 }
 .justify-content-center { justify-content: center !important; }
+
+/* Custom Form Stack Gap Alignment */
+.form-container-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group label {
   font-size: 0.75rem;
@@ -715,6 +933,62 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
   width: 100%;
 }
 .form-input:focus { border-color: #6366f1; }
+
+/* Styling Dropdown Select Custom Arrow */
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% - 2px),
+    calc(100% - 14px) calc(50% - 2px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 40px;
+}
+.form-select:focus {
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6366f1 50%),
+    linear-gradient(135deg, #6366f1 50%, transparent 50%);
+}
+
+/* ===== STYLING SEGMENTED CONTROL PILL ===== */
+.segment-group {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-main);
+  padding: 4px;
+  border-radius: 30px; /* Membuat base melengkung penuh kapsul */
+  width: 100%;
+  overflow-x: auto;
+}
+.segment-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 24px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  text-align: center;
+}
+.segment-btn:hover:not(.active) {
+  background: var(--bg-nav-hover);
+}
+.segment-btn.active {
+  background: #6366f1; /* Menggunakan warna ungu serasi tema dashboard-mu */
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.35);
+}
+
 .btn-cancel {
   padding: 8px 18px;
   background: var(--bg-main);
@@ -786,6 +1060,7 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
   color: var(--text-muted);
 }
 .detail-value { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+.font-semibold { font-weight: 600; }
 .mono { font-family: monospace; font-weight: 700; }
 .detail-badge {
   font-size: 0.82rem;
@@ -803,5 +1078,69 @@ function closeDetailModal()    { isDetailModalVisible.value = false; detailMenu.
   border-radius: 99px;
   background: rgba(34,197,94,0.1);
   color: #16a34a;
+}
+
+/* ===== STYLING CUSTOM FILE UPLOAD ===== */
+.file-upload-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Sembunyikan input file bawaan HTML yang jelek */
+.file-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Label pengganti sebagai container luar */
+.file-custom-label {
+  display: flex;
+  align-items: center;
+  border: 1.5px dashed var(--border-main);
+  border-radius: 8px;
+  padding: 4px;
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.file-custom-label:hover {
+  border-color: #6366f1;
+}
+
+/* Tombol Browse Ungu di bagian kiri */
+.btn-browse {
+  background: #6366f1;
+  color: #ffffff;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.file-custom-label:hover .btn-browse {
+  background: #4f46e5;
+}
+
+/* Teks nama file di sebelah tombol */
+.file-name-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding-left: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 </style>

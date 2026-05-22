@@ -58,6 +58,12 @@ const routes = [
         component: () => import('@/views/template/table/TableView.vue'),
       },
 
+      {
+        path: 'table-with-components',
+        name: 'Table with Components',
+        component: () => import('@/views/template/table/TableWithComponentsView.vue'),
+      },
+
 
       {
         path: 'settings',
@@ -88,6 +94,12 @@ const routes = [
         path: 'home-manager',
         name: 'Manager Home',
         component: () => import('@/views/template/home/HomeManagerView.vue'),
+      },
+
+      {
+        path: 'modal-demo',
+        name: 'Modal Demo',
+        component: () => import('@/views/template/modal/ModalTemplateView.vue'),
       },
 
     ],

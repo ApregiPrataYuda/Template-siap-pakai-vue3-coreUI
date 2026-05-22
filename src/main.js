@@ -71,7 +71,17 @@ import {
   faMobileScreen,
   faBan,
   faClock,
-  faHome
+  faHome,
+  faWindowRestore,
+  faCircleQuestion,
+  faTerminal,
+  faCode,
+  faRotate,
+  faWandMagicSparkles,
+  faArrowLeft,
+  faCircleCheck,
+  faXmark,
+  faTableList,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -83,25 +93,13 @@ library.add(
   faSpinner, faInbox, faChevronLeft,
   faCircleUser, faCircleInfo, faClockRotateLeft,
   faUserPlus, faRightToBracket, faCheck, faPhone, faLocationDot,
-  faChevronDown, faCircle,faEnvelope,
-  faLock,
-  faEye,
-  faEyeSlash, 
-  faEdit, faUpload,
-  faDownload,
-  faSync,
-  faList,
-  faExclamationTriangle,
-  faFileCsv,
-  faFileExcel,
-  faFilePdf,
-  faRotateLeft,
-  faTrashCan,
-  faCircleLeft,
-  faCircleRight,faChartPie,
-  faLink,faArrowTrendUp, faArrowTrendDown, faArrowRight, faShieldHalved, faPalette, faFloppyDisk,
-  faCamera,
-  faDesktop, faMobileScreen, faBan, faClock, faHome
+  faChevronDown, faCircle, faEnvelope, faLock, faEye, faEyeSlash, 
+  faEdit, faUpload, faDownload, faSync, faList, faExclamationTriangle,
+  faFileCsv, faFileExcel, faFilePdf, faRotateLeft, faTrashCan, faCircleLeft,
+  faCircleRight,faChartPie,faLink,faArrowTrendUp, faArrowTrendDown, faArrowRight,
+  faShieldHalved, faPalette, faFloppyDisk, faCamera, faDesktop, faMobileScreen, 
+  faBan, faClock, faHome, faWindowRestore,faCircleQuestion, faTerminal, faCode, faRotate,
+  faWandMagicSparkles, faArrowLeft, faArrowRight, faUserPlus, faCircleCheck, faXmark, faTableList
 )
 
 const app = createApp(App)

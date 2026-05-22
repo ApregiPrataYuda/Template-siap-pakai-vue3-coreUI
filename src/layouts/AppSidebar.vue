@@ -159,15 +159,29 @@ const menus = [
         icon: 'circle-user',
         to: '/app/profile',
       },
+      
       {
         label: 'Settings',
         icon: 'gear',
         to: '/app/settings',
       },
+
       {
         label: 'Table',
         icon: 'table',
         to: '/app/table',
+      },
+
+      {
+        label: 'Table with Components',
+        icon: 'table',
+        to: '/app/table-with-components',
+      },
+
+       { 
+         label: 'Modal Demo',
+         icon: 'window-restore',
+         to: '/app/modal-demo' 
       },
     ],
   },
