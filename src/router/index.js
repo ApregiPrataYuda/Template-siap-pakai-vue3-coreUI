@@ -9,12 +9,19 @@ const routes = [
   ========================================= */
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/home',
   },
 
   /* ========================================
      AUTH ROUTES (NO LAYOUT / GUEST ONLY)
   ========================================= */
+
+  {
+  path: '/home',
+  name: 'Home',
+  component: () => import('@/views/template/home/HomeView.vue'),
+},
+
   {
     path: '/login',
     name: 'Login',
